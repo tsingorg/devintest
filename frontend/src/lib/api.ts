@@ -83,4 +83,17 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to delete feature');
   },
+
+  // Import feature list from file
+  importList: async (file: File): Promise<FeatureList> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_URL}/api/import`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) throw new Error('Failed to import feature list');
+    return response.json();
+  },
 };

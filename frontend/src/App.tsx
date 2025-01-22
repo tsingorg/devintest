@@ -109,6 +109,22 @@ function App() {
           onCreateNew={handleCreateNew}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onImport={async (file: File) => {
+            try {
+              await api.importList(file);
+              toast({
+                title: 'Success',
+                description: 'Feature list imported successfully',
+              });
+              await loadLists();
+            } catch (error) {
+              toast({
+                title: 'Error',
+                description: 'Failed to import feature list',
+                variant: 'destructive',
+              });
+            }
+          }}
         />
       </main>
 
