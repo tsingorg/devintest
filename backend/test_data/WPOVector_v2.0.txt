@@ -1,0 +1,4 @@
+1,isValidForModel
+2,EngagementValue7dWStatCount
+6,EngagementValue7dWStatMin
+7,EngagementValue7dWStatMax

@@ -130,5 +130,54 @@ def delete_feature(list_id, feature_id):
     db.session.commit()
     return '', 204
 
+@app.route('/api/import', methods=['POST'])
+def import_list():
+    """Import a feature list from a text file."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    if not file.filename:
+        return jsonify({'error': 'No file selected'}), 400
+    
+    # Extract list name from filename (remove extension)
+    list_name = os.path.splitext(file.filename)[0]
+    
+    # Create new list
+    new_list = List(name=list_name, remarks='Imported from file')
+    db.session.add(new_list)
+    db.session.flush()  # Get the new list ID
+    
+    # Read and parse file
+    try:
+        content = file.read().decode('utf-8')
+        for line in content.splitlines():
+            line = line.strip()
+            if not line:  # Skip empty lines
+                continue
+            
+            parts = line.split(',')
+            if len(parts) < 2:  # Skip invalid lines
+                continue
+            
+            feature_id = parts[0].strip()
+            feature_name = parts[1].strip()
+            
+            # Create new feature
+            new_feature = Feature(
+                list_id=new_list.id,
+                feature_id=feature_id,
+                feature_name=feature_name,
+                remarks=''
+            )
+            db.session.add(new_feature)
+        
+        db.session.commit()
+        return jsonify(new_list.to_dict()), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
